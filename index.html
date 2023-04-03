@@ -14,80 +14,73 @@
     </style>
 </head>
 <body>
-    <script>
-        const config = {
-            type: Phaser.AUTO,
-            width: window.innerWidth,
-            height: window.innerHeight,
-            physics: {
-                default: 'arcade',
-                arcade: {
-                    gravity: { y: 300 },
-                    debug: true
-                }
-            },
-            scene: {
-                preload: preload,
-                create: create,
-                update: update
+   <script>
+    const config = {
+        type: Phaser.AUTO,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        physics: {
+            default: 'arcade',
+            arcade: {
+                gravity: { y: 300 },
+                debug: false
             }
-        };
+        },
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
 
-        const game = new Phaser.Game(config);
-        const images = [
-            'a.png'
-        ];
-        let dragStartX;
+    const game = new Phaser.Game(config);
+    const images = [
+        'a.png'
+    ];
+    let dragStartX;
 
-        function preload() {
-            for (let i = 0; i < images.length; i++) {
-                this.load.image(`myImage${i}`, images[i]);
-            }
+    function preload() {
+        for (let i = 0; i < images.length; i++) {
+            this.load.image(`myImage${i}`, images[i]);
+        }
+    }
+
+    function create() {
+        for (let i = 0; i < images.length; i++) {
+            const image = this.physics.add.image(
+                Phaser.Math.Between(50, config.width - 50),
+                Phaser.Math.Between(50, config.height - 50),
+                `myImage${i}`
+            );
+            // 設定圖像的寬度和高度都為80
+            image.displayWidth = 80;
+            image.displayHeight = 80;
+            image.setCollideWorldBounds(true);
+            image.setBounce(0.9);
         }
 
-        function create() {
-            for (let i = 0; i < images.length; i++) {
-                const image = this.physics.add.image(
-                    Phaser.Math.Between(50, config.width - 50),
-                    Phaser.Math.Between(50, config.height - 50),
-                    `myImage${i}`
-                );
-                // 设置图像的宽度为80
-                image.displayWidth = 80;
-                image.setCollideWorldBounds(true);
-                image.setBounce(0.9);
-            }
+        this.input.on('dragstart', function (pointer, gameObject) {
+            gameObject.setTint(0xff0000);
+            dragStartX = pointer.x;
+        });
 
-            this.input.on('pointerdown', function (pointer) {
-                const image = this.physics.add.image(pointer.x, pointer.y, `myImage${Phaser.Math.Between(0, images.length - 1)}`);
-                // 设置图像的宽度为80
-                image.displayWidth = 80;
-                image.setCollideWorldBounds(true);
-                image.setBounce(0.9);
-                image.setVelocity(Phaser.Math.Between(-200, 200), Phaser.Math.Between(-200, 200));
-            }, this);
+        this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
+            gameObject.x = dragX;
+            gameObject.y = dragY;
+        });
 
-            this.input.on('dragstart', function (pointer, gameObject) {
-                gameObject.setTint(0xff0000);
-                dragStartX = pointer.x;
-            });
+        this.input.on('dragend', function (pointer, gameObject) {
+            gameObject.clearTint();
+            let acceleration = (pointer.x - dragStartX) * 10;
+            gameObject.setVelocityX(acceleration);
+        });
 
-            this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
-                gameObject.x = dragX;
-                gameObject.y = dragY;
-            });
+        this.physics.add.collider(this.physics.world.bounds, this.physics.world.staticBodies);
+    }
 
-            this.input.on('dragend', function (pointer, gameObject) {
-                gameObject.clearTint();
-                let acceleration = (pointer.x - dragStartX) * 10;
-                gameObject.setVelocityX(acceleration);
-            });
+    function update() {
+    }
+</script>
 
-            this.physics.add.collider(this.physics.world.bounds, this.physics.world.staticBodies);
-        }
-
-        function update() {
-        }
-    </script>
 </body>
 </html
