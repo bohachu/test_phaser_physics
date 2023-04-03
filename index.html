@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phaser JS Image Gravity, Drag, and Acceleration</title>
+    <title>Phaser JS Multiple Images Physics Collision</title>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
     <style>
         body {
@@ -23,7 +23,7 @@
                 default: 'arcade',
                 arcade: {
                     gravity: { y: 300 },
-                    debug: false
+                    debug: true
                 }
             },
             scene: {
@@ -34,24 +34,39 @@
         };
 
         const game = new Phaser.Game(config);
-        let image;
+        const images = [
+            'a.png'
+        ];
         let dragStartX;
 
         function preload() {
-            this.load.image('myImage', '截圖 2023-04-03 11.06.13.png');
+            for (let i = 0; i < images.length; i++) {
+                this.load.image(`myImage${i}`, images[i]);
+            }
         }
 
         function create() {
-            image = this.physics.add.image(config.width / 2, 0, 'myImage').setInteractive();
-            image.setCollideWorldBounds(true);
-            image.setBounce(0.9);
+            for (let i = 0; i < images.length; i++) {
+                const image = this.physics.add.image(
+                    Phaser.Math.Between(50, config.width - 50),
+                    Phaser.Math.Between(50, config.height - 50),
+                    `myImage${i}`
+                );
+                // 设置图像的宽度为80
+                image.displayWidth = 80;
+                image.setCollideWorldBounds(true);
+                image.setBounce(0.9);
+            }
 
-            // 设置图像的宽度和高度
-            const width = 90;
-            const height = (width / image.width) * image.height;
-            image.setDisplaySize(width, height);
+            this.input.on('pointerdown', function (pointer) {
+                const image = this.physics.add.image(pointer.x, pointer.y, `myImage${Phaser.Math.Between(0, images.length - 1)}`);
+                // 设置图像的宽度为80
+                image.displayWidth = 80;
+                image.setCollideWorldBounds(true);
+                image.setBounce(0.9);
+                image.setVelocity(Phaser.Math.Between(-200, 200), Phaser.Math.Between(-200, 200));
+            }, this);
 
-            this.input.setDraggable(image);
             this.input.on('dragstart', function (pointer, gameObject) {
                 gameObject.setTint(0xff0000);
                 dragStartX = pointer.x;
@@ -67,10 +82,12 @@
                 let acceleration = (pointer.x - dragStartX) * 10;
                 gameObject.setVelocityX(acceleration);
             });
+
+            this.physics.add.collider(this.physics.world.bounds, this.physics.world.staticBodies);
         }
 
         function update() {
         }
     </script>
 </body>
-</html>
+</html
