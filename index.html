@@ -38,6 +38,7 @@
         'a.png'
     ];
     let dragStartX;
+    let dragStartY;
 
     function preload() {
         for (let i = 0; i < images.length; i++) {
@@ -57,11 +58,15 @@
             image.displayHeight = 80;
             image.setCollideWorldBounds(true);
             image.setBounce(0.9);
+
+            image.setInteractive({ draggable: true });
+            this.input.setDraggable(image);
         }
 
         this.input.on('dragstart', function (pointer, gameObject) {
             gameObject.setTint(0xff0000);
             dragStartX = pointer.x;
+            dragStartY = pointer.y;
         });
 
         this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
@@ -71,8 +76,9 @@
 
         this.input.on('dragend', function (pointer, gameObject) {
             gameObject.clearTint();
-            let acceleration = (pointer.x - dragStartX) * 10;
-            gameObject.setVelocityX(acceleration);
+            let accelerationX = (pointer.x - dragStartX) * 10;
+            let accelerationY = (pointer.y - dragStartY) * 10;
+            gameObject.setVelocity(accelerationX, accelerationY);
         });
 
         this.physics.add.collider(this.physics.world.bounds, this.physics.world.staticBodies);
@@ -83,4 +89,4 @@
 </script>
 
 </body>
-</html
+</html>
