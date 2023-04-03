@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phaser JS Image Gravity and Drag</title>
+    <title>Phaser JS Image Gravity, Drag, and Acceleration</title>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
     <style>
         body {
@@ -35,6 +35,7 @@
 
         const game = new Phaser.Game(config);
         let image;
+        let dragStartX;
 
         function preload() {
             this.load.image('myImage', 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/320px-PNG_transparency_demonstration_1.png');
@@ -48,6 +49,7 @@
             this.input.setDraggable(image);
             this.input.on('dragstart', function (pointer, gameObject) {
                 gameObject.setTint(0xff0000);
+                dragStartX = pointer.x;
             });
 
             this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
@@ -57,6 +59,8 @@
 
             this.input.on('dragend', function (pointer, gameObject) {
                 gameObject.clearTint();
+                let acceleration = (pointer.x - dragStartX) * 10;
+                gameObject.setVelocityX(acceleration);
             });
         }
 
